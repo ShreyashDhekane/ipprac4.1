@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customized T-Shirt Order Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        fieldset {
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            vertical-align: top;
+        }
+        input, select, textarea {
+            width: 250px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        .error {
+            color: red;
+            margin-left: 150px;
+            font-size: 0.9em;
+        }
+        #receipt {
+            display: none;
+            border: 2px solid #4CAF50;
+            padding: 20px;
+            background-color: #f9fff9;
+        }
+        #receipt h2 {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Your Customized T-Shirt</h1>
+    <form id="orderForm">
+        <fieldset>
+            <legend>Shirt Details</legend>
+            
+            <label for="tagline">Message on the Shirt:</label>
+            <input type="text" id="tagline" name="tagline" placeholder="Enter your tagline" minlength="1" maxlength="10" required>
+            <span class="error" id="taglineError"></span>
+            <br>
+
+            <label for="color">Color:</label>
+            <input type="color" id="favcolor" name="favcolor" value="#808080" required>
+            <br>
+
+            <label for="size">Size:</label>
+            <select id="size" name="size" required>
+                <option value="">Select size</option>
+                <option value="Small">Small</option>
+                <option value="Medium">Medium</option>
+                <option value="Large">Large</option>
+                <option value="X-Large">X-Large</option>
+            </select>
+            <span class="error" id="sizeError"></span>
+            <br>
+
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1" max="10" placeholder="1" required>
+            <span class="error" id="quantityError"></span>
+            <br>
+
+            <label for="delivery-date">Delivery Date:</label>
+            <input type="date" id="delivery-date" name="delivery-date"  required>
+            <span class="error" id="dateError"></span>
+            <br>
+        </fieldset>
+        
+        <fieldset>
+            <legend>Delivery Details</legend>
+            
+            <label for="name">Recipient's Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter recipient's name" required>
+            <span class="error" id="nameError"></span>
+            <br>
+
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" placeholder="Enter delivery address" required>
+            <span class="error" id="addressError"></span>
+            <br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter email address" required>
+            <span class="error" id="emailError"></span>
+            <br>
+
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" placeholder="Enter phone number" pattern="[7-9]{1}[0-9]{9}" required>
+            <span class="error" id="phoneError"></span>
+            <br>
+
+            <label for="comments">Additional Comments:</label>
+            <textarea id="comments" name="comments" placeholder="Enter any special instructions" rows="4" cols="50"></textarea>
+            <br>
+        </fieldset>
+        
+        <button type="submit">Submit Order</button>
+        <button type="reset">Reset Form</button>
+    </form>
+
+    <div id="receipt">
+        <h2>Order Receipt</h2>
+        <p><strong>Receipt Generated On:</strong> <span id="receiptDate"></span></p>
+        <h3>Shirt Details</h3>
+        <p><strong>Message:</strong> <span id="receiptTagline"></span></p>
+        <p><strong>Color:</strong> <span id="receiptColor"></span></p>
+        <p><strong>Size:</strong> <span id="receiptSize"></span></p>
+        <p><strong>Quantity:</strong> <span id="receiptQuantity"></span></p>
+        <p><strong>Delivery Date:</strong> <span id="receiptDeliveryDate"></span></p>
+
+        <h3>Delivery Details</h3>
+        <p><strong>Recipient's Name:</strong> <span id="receiptName"></span></p>
+        <p><strong>Address:</strong> <span id="receiptAddress"></span></p>
+        <p><strong>Email:</strong> <span id="receiptEmail"></span></p>
+        <p><strong>Phone Number:</strong> <span id="receiptPhone"></span></p>
+        <p><strong>Additional Comments:</strong> <span id="receiptComments"></span></p>
+    </div>
+
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form from submitting
+
+            // Clear previous errors
+            clearErrors();
+
+            // Perform validation
+            let isValid = validateForm();
+
+            if (isValid) {
+                generateReceipt();
+                // Optionally, you can reset the form after generating receipt
+                // document.getElementById('orderForm').reset();
+            }
+        });
+
+        function clearErrors() {
+            const errorElements = document.querySelectorAll('.error');
+            errorElements.forEach(function(el) {
+                el.textContent = '';
+            });
+        }
+
+        function validateForm() {
+            let valid = true;
+
+            // Tagline validation (max 50 characters)
+            const tagline = document.getElementById('tagline').value.trim();
+            if (tagline.length > 50) {
+                document.getElementById('taglineError').textContent = 'Maximum 50 characters allowed.';
+                valid = false;
+            }
+
+            // Phone number validation (starts with 7-9 and 10 digits)
+            const phone = document.getElementById('phone').value.trim();
+            const phonePattern = /^[7-9]\d{9}$/;
+            if (!phonePattern.test(phone)) {
+                document.getElementById('phoneError').textContent = 'Enter a valid 10-digit phone number starting with 7, 8, or 9.';
+                valid = false;
+            }
+
+            // Additional validations can be added here if necessary
+
+            return valid;
+        }
+
+        function generateReceipt() {
+            // Get current date and time
+            const now = new Date();
+            const formattedDate = now.toLocaleString();
+
+            // Get form values
+            const tagline = document.getElementById('tagline').value.trim();
+            const color = document.getElementById('favcolor').value;
+            const size = document.getElementById('size').value;
+            const quantity = document.getElementById('quantity').value;
+            const deliveryDate = document.getElementById('delivery-date').value;
+
+            const name = document.getElementById('name').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const comments = document.getElementById('comments').value.trim();
+
+            // Populate receipt fields
+            document.getElementById('receiptDate').textContent = formattedDate;
+            document.getElementById('receiptTagline').textContent = tagline;
+            document.getElementById('receiptColor').textContent = color;
+            document.getElementById('receiptSize').textContent = size;
+            document.getElementById('receiptQuantity').textContent = quantity;
+            document.getElementById('receiptDeliveryDate').textContent = deliveryDate;
+
+            document.getElementById('receiptName').textContent = name;
+            document.getElementById('receiptAddress').textContent = address;
+            document.getElementById('receiptEmail').textContent = email;
+            document.getElementById('receiptPhone').textContent = phone;
+            document.getElementById('receiptComments').textContent = comments ? comments : 'None';
+
+            // Hide the form and show the receipt
+            document.getElementById('orderForm').style.display = 'none';
+            document.getElementById('receipt').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
